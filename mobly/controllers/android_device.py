@@ -91,9 +91,9 @@ EMULATOR_SERIAL_REGEX = re.compile(r'emulator-\d+')
 
 def create(configs):
   """Creates AndroidDevice controller objects.
-
+.........|.........|.........|.........|.........|.........|.........|.........|
   Args:
-    configs: A list of dicts, each representing a configuration for an
+    configs: A sequence of mappings, each representing a configuration for an
       Android device.
 
   Returns:
@@ -103,9 +103,9 @@ def create(configs):
     raise Error(ANDROID_DEVICE_EMPTY_CONFIG_MSG)
   elif configs == ANDROID_DEVICE_PICK_ALL_TOKEN:
     ads = get_all_instances()
-  elif not isinstance(configs, list):
+  elif not isinstance(configs, Sequence):
     raise Error(ANDROID_DEVICE_NOT_LIST_CONFIG_MSG)
-  elif isinstance(configs[0], dict):
+  elif isinstance(configs[0], Mapping):
     # Configs is a list of dicts.
     ads = get_instances_with_configs(configs)
   elif isinstance(configs[0], str):
@@ -255,29 +255,26 @@ def list_fastboot_devices():
 
 
 def get_instances(serials):
-  """Create AndroidDevice instances from a list of serials.
+  """Create AndroidDevice instances from a sequence of serials.
 
   Args:
-    serials: A list of android device serials.
+    serials: A sequence of android device serials.
 
   Returns:
     A list of AndroidDevice objects.
   """
   _validate_device_existence(serials)
 
-  results = []
-  for s in serials:
-    results.append(AndroidDevice(s))
-  return results
+  return [AndroidDevice(s) for s in serials]
 
 
 def get_instances_with_configs(configs):
-  """Create AndroidDevice instances from a list of dict configs.
+  """Create AndroidDevice instances from a sequence of mapping configs.
 
   Each config should have the required key-value pair 'serial'.
 
   Args:
-    configs: A list of dicts each representing the configuration of one
+    configs: A sequence of mappings each representing the configuration of one
       android device.
 
   Returns:
@@ -330,18 +327,14 @@ def filter_devices(ads, func):
   conditions.
 
   Args:
-    ads: A list of AndroidDevice instances.
+    ads: A sequence of AndroidDevice instances.
     func: A function that takes an AndroidDevice object and returns True
       if the device satisfies the filter condition.
 
   Returns:
     A list of AndroidDevice instances that satisfy the filter condition.
   """
-  results = []
-  for ad in ads:
-    if func(ad):
-      results.append(ad)
-  return results
+  return [ad for ad in ads if func(ad)]
 
 
 def get_devices(ads, **kwargs):
@@ -353,7 +346,7 @@ def get_devices(ads, **kwargs):
     get_devices(android_devices, model='angler')
 
   Args:
-    ads: A list of AndroidDevice instances.
+    ads: A sequence of AndroidDevice instances.
     kwargs: keyword arguments used to filter AndroidDevice instances.
 
   Returns:
@@ -388,7 +381,7 @@ def get_device(ads, **kwargs):
     get_device(android_devices, model='angler')
 
   Args:
-    ads: A list of AndroidDevice instances.
+    ads: A sequence of AndroidDevice instances.
     kwargs: keyword arguments used to filter AndroidDevice instances.
 
   Returns:
@@ -407,15 +400,15 @@ def get_device(ads, **kwargs):
 
 
 def take_bug_reports(ads, test_name=None, begin_time=None, destination=None):
-  """Takes bug reports on a list of android devices.
+  """Takes bug reports on a sequence of android devices.
 
-  If you want to take a bug report, call this function with a list of
+  If you want to take a bug report, call this function with a sequence of
   android_device objects in on_fail. But reports will be taken on all the
   devices in the list concurrently. Bug report takes a relative long
   time to take, so use this cautiously.
 
   Args:
-    ads: A list of AndroidDevice instances.
+    ads: A sequence of AndroidDevice instances.
     test_name: Name of the test method that triggered this bug report.
       If None, the default name "bugreport" will be used.
     begin_time: timestamp taken when the test started, can be either
