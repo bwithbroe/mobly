@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """ Module for Mobly controller management."""
+from collections.abc import Sequence
 import collections
 import copy
 import logging
@@ -124,7 +125,7 @@ class ControllerManager:
           'Failed to initialize objects for controller %s, abort!',
           module_config_name)
       raise
-    if not isinstance(objects, list):
+    if not isinstance(objects, Sequence):
       raise signals.ControllerError(
           'Controller module %s did not return a list of objects, abort.' %
           module_ref_name)
